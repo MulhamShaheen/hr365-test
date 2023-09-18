@@ -1,0 +1,32 @@
+version: '1.0'
+
+services:
+    django:
+        build: .
+        command: "gunicorn -c gunicorn.py karnaukhov_test.wsgi"
+        # command: sh -c "gunicorn --bind 0.0.0.0:8000 karnaukhov_test.wsgi "python manage.py runserver localhost:8000
+        volumes:
+            - ./karnaukhov:/app
+            - ./karnaukhov/static:/app/static
+        expose:
+            - 8000
+        ports:
+            - "8000:8000"
+        environment:
+            - DEBUG=1
+    nginx:
+        image: nginx:1.19.8-alpine
+        depends_on:
+            - django
+        expose:
+            - 8080
+        ports:
+            - "80:8080"
+        volumes:
+            - ./karnaukhov/static:/app/static
+            - ./nginx/1:/etc/nginx/conf.d/1
+            # - ./nginx/ssl:/etc/nginx/ssl
+
+volumes:
+  pg_data:
+  static:
