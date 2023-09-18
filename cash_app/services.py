@@ -1,11 +1,16 @@
-import json
-import requests
 from django.conf import settings
 import currencyapicom
 
 
 def request_course(base_currency: str, target: str, amount: float):
     client = currencyapicom.Client(settings.API_KEY)
-    result = client.convert(base_currency=base_currency, currencies=[target], value=amount)
+    rates = client.latest()['data']
 
-    return result
+    value_in_usd = amount / rates[base_currency]["value"]
+    output_value = value_in_usd * rates[target]["value"]
+
+    response = {
+        "result": output_value
+    }
+
+    return response
